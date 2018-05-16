@@ -38,7 +38,7 @@ function draw(){
       scene=0;
 
       soundSummon();
-      
+
       mainOsc = new p5.Oscillator();
       mainOsc.setType('square');
       mainOsc.freq(440);
@@ -90,7 +90,6 @@ function draw(){
       step=50;
       tic=0;
       roamer.stepUpdate(2);
-      noiseOsc.start();
     }
     bassOsc.amp(map(roamer.asize,step/5,step,2,0));
   }
@@ -110,7 +109,6 @@ function draw(){
         }
       }
       bassOsc.amp(map(roamer.asize,step/5,step,2,0)*(map(a/step,0,7,1,0)));
-      //noiseOsc.amp(map(roamer.asize,step/5,step,2,0)*(map(a/step,0,7,0,1)));
     }
     else if(a/step>=8 && a/step<17){
       bassOsc.amp(0);
