@@ -4,7 +4,6 @@ var step = 25;
 
 var mainOsc;
 var bassOsc;
-var noiseOsc;
 var trebleOsc;
 
 var tic=0;
@@ -23,23 +22,7 @@ function setup(){
   fill(255);
   noStroke();
 
-  mainOsc = new p5.Oscillator();
-  mainOsc.setType('square');
-  mainOsc.freq(440);
-  mainOsc.amp(0);
 
-  bassOsc = new p5.Oscillator();
-  bassOsc.setType('saw');
-  bassOsc.freq(110);
-  bassOsc.amp(0);
-
-  trebleOsc = new p5.Oscillator();
-  trebleOsc.setType('saw');
-  trebleOsc.freq(880);
-  trebleOsc.amp(0);
-
-  noiseOsc = new p5.Noise();
-  noiseOsc.amp(0);
 }
 
 
@@ -53,6 +36,23 @@ function draw(){
     text('press any key',width/2,2*height/3);
     if(keyIsPressed){
       scene=0;
+
+      soundSummon();
+      
+      mainOsc = new p5.Oscillator();
+      mainOsc.setType('square');
+      mainOsc.freq(440);
+      mainOsc.amp(0);
+
+      bassOsc = new p5.Oscillator();
+      bassOsc.setType('saw');
+      bassOsc.freq(110);
+      bassOsc.amp(0);
+
+      trebleOsc = new p5.Oscillator();
+      trebleOsc.setType('saw');
+      trebleOsc.freq(880);
+      trebleOsc.amp(0);
       mainOsc.start();
       bassOsc.start();
     }
@@ -350,7 +350,9 @@ var roamer = {
         this.sizeUp=true;
       }
     }
-    mainOsc.amp(map(this.asize,step/5,step,0,1));
+    if(scene!=-1){
+      mainOsc.amp(map(this.asize,step/5,step,0,1));
+    }
   },
 
   isIn:function(x1, x2, y1, y2){
