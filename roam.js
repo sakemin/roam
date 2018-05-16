@@ -1,4 +1,4 @@
-var scene = 0;
+var scene = -1;
 
 var step = 25;
 
@@ -27,10 +27,8 @@ function setup(){
   mainOsc.setType('square');
   mainOsc.freq(440);
   mainOsc.amp(0);
-  mainOsc.start();
 
   bassOsc = new p5.Oscillator();
-  bassOsc.start();
   bassOsc.setType('saw');
   bassOsc.freq(110);
   bassOsc.amp(0);
@@ -48,7 +46,19 @@ function setup(){
 function draw(){
   background(0);
 
-  if(scene==0){
+  if(scene==-1){
+    textSize(step*2);
+    text('r o a m',width/2,height/3);
+    textSize(step);
+    text('press any key',width/2,2*height/3);
+    if(keyIsPressed){
+      scene=0;
+      mainOsc.start();
+      bassOsc.start();
+    }
+  }
+  else if(scene==0){
+    textSize(step*2);
     text('r o a m',width/2,height/3);
     if(tic>=44){
       fill(0);
@@ -289,7 +299,7 @@ function draw(){
     roamer.sizeChange();
   }
 
-  console.log(scene);
+  // console.log(scene);
 }
 
 
