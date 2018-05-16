@@ -9,6 +9,11 @@ var trebleOsc;
 
 var tic=0;
 
+var grav=1;
+var jumpPower =15;
+
+var num=0;
+
 function setup(){
   createCanvas(800,600);
   background(0);
@@ -177,7 +182,7 @@ function draw(){
     }
 
 
-    if(tic>=332){
+    if(tic>=212){
       scene=5;
       tic=0;
       step=25;
@@ -187,16 +192,104 @@ function draw(){
       bassOsc.setType('saw');
       trebleOsc.stop();
       bassOsc.stop();
+      roamer.x=width/2;
+      roamer.y=height/2;
     }
 
 
   }
+  else if(scene==5){
+    if(keyIsDown(RIGHT_ARROW)){
+      roamer.x+=5;
+      if(roamer.x>width-step/2){roamer.x=width-step/2;}
+    }
+    else if(keyIsDown(LEFT_ARROW)){
+      roamer.x-=5;
+      if(roamer.x<step/2){roamer.x=step/2;}
+    }
+    roamer.gravCal();
 
-  if(scene!=3 && scene!=4){
+    brick(650,520,300);
+    brick(150,520,300);
+    brick(650,440,150);
+    brick(150,440,150);
+    brick(750,360,150);
+    brick(50,360,150);
+    brick(250,280,170);
+    brick(550,280,170);
+    brick(400,200,200);
+    brick(150,120,170);
+    brick(650,120,170);
+    brick(400,40,200);
+
+    rect(400,125,roamer.asize,roamer.asize);
+
+    if(roamer.x>=400-step/2&&roamer.x<=400+step/2&&roamer.y<=125+step/2&&roamer.y>=125-step/2){
+      roamer.x=400;
+      roamer.y=125;
+      scene=6;
+      tic=0;
+      bassOsc.start();
+      bassOsc.freq(110);
+    }
+
+    roamer.pyUpdate();
+  }
+  else if(scene==6){
+    var i = 1+tic%(width/step-1);
+    var j = 1+int(tic/(width/step-1));
+
+    rect(i*step,j*step,step/5,step/5+step-roamer.asize);
+    rect(i*step,j*step,step/5+step-roamer.asize,step/5);
+    rect(i*step,j*step,step/5+3*step/5-roamer.bsize,step/5+3*step/5-roamer.bsize);
+
+    bassOsc.freq(110+(i-1)+(j-1)*32);
+
+    bassOsc.amp(map(roamer.asize,step/5,step,0,1));
+
+    if(tic==139){
+      scene=7;
+      tic=0;
+      roamer.x=width/2;
+      roamer.y=height/2;
+      bassOsc.stop();
+      step=500;
+      roamer.stepUpdate(20);
+    }
+  }
+  else if(scene==7){
+    if(tic>=4){
+      roamer.sizeUp=true;
+    }
+
+    num++;
+
+    if(num>=2150){
+      background(255);
+      scene=8;
+      mainOsc.stop();
+    }
+
+  }
+  else if(scene==8){
+    background(255);
+    fill(0);
+    textSize(50);
+    text('r o a m',width/2,2*height/5);
+    textSize(25);
+    text('sakemin',width/2,2.5*height/5);
+    text('2018',width/2,3*height/5);
+  }
+
+  if(scene!=8 && scene!=3 && scene!=4){
     roamer.display();
   }
-  roamer.sizeChange();
 
+  if(scene!=8){
+    roamer.sizeChange();
+  }
+
+  console.log(scene);
 }
 
 
@@ -204,10 +297,16 @@ var roamer = {
   x:400,
   y:300,
 
+  py:300,
+
+  dy:0,
+
   asize:step,
   bsize:3*step/5,
 
   sizeUp:false,
+
+  landed:false,
 
   display:function(){
     rect(this.x,this.y,step/5,this.asize);
@@ -257,15 +356,28 @@ var roamer = {
     rect(800-this.x,600-this.y,step/5,this.asize);
     rect(800-this.x,600-this.y,this.asize,step/5);
     rect(800-this.x,600-this.y,this.bsize,this.bsize);
+  },
+
+  gravCal:function(){
+    this.y-=this.dy;
+    this.dy-=grav;
+    if(this.landed){this.dy=0;}
+    if(this.y>height-step/2){
+      this.y=height-step/2;
+      this.landed=true;
+    }
+  },
+
+  pyUpdate:function(){
+    this.py=this.y;
   }
 }
 
 function keyPressed(){
 
-  if(key == '1'){step=50; roamer.stepUpdate(); scene=3;}
-    if(key == '2'){step=100; }
+  // if(key == '1'){ scene=5;}
 
-  if(scene!=4 || (scene==4&&tic<32)){
+  if((scene!=7 && scene!=5 && scene!=4 && scene!=6) || (scene==4&&tic<32)){
 
     if(keyCode == RIGHT_ARROW){
       roamer.x+=step;
@@ -280,6 +392,12 @@ function keyPressed(){
       roamer.x-=step;
     }
   }
+  else if(scene==5){
+    if(((keyCode == UP_ARROW)||(key == ' '))&&roamer.landed){
+      roamer.dy=jumpPower;
+      roamer.landed=false;
+    }
+  }
 
   if(roamer.x<0){roamer.x=0;}
   else if(roamer.x>width){roamer.x=width;}
@@ -287,4 +405,25 @@ function keyPressed(){
   if(roamer.y<0){roamer.y=0;}
   else if(roamer.y>height){roamer.y=height;}
   // console.log(roamer.x/step,roamer.y/step);
+}
+
+function brick(x,y,w){
+  if(roamer.x>=x-w/2&&roamer.x<=x+w/2&&roamer.y>=y-step&&roamer.py<=y-step){
+    roamer.landed=true;
+    roamer.y=y-step;
+  }
+  else if(roamer.x>=x-w/2&&roamer.x<=x+w/2&&roamer.y<=y+step&&roamer.py>=y+step){
+    roamer.y=y+step;
+  }
+  else if(((roamer.x<=x-w/2&&roamer.x>=x-w/2-step)||(roamer.x>=x+w/2&&roamer.x<=x+w/2+step))&&roamer.y==y-step){
+    roamer.landed=false;
+  }
+
+  if((roamer.x>x-w/2-step/2&&roamer.x<x)&&(roamer.y>y-step&&roamer.y<y+step)){
+    roamer.x=x-w/2-step/2;
+  }
+  else if((roamer.x<x+w/2+step/2&&roamer.x>x)&&(roamer.y>y-step&&roamer.y<y+step)){
+    roamer.x=x+w/2+step/2;
+  }
+  rect(x,y,w,step);
 }
