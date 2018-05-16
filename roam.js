@@ -55,6 +55,8 @@ function draw(){
       trebleOsc.amp(0);
       mainOsc.start();
       bassOsc.start();
+
+      tic=0;
     }
   }
   else if(scene==0){
